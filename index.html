@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+    <meta name="description" content="A beautiful and modern Kanban To-Do List Application">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">✴</span>
+                <h2>ToDo</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="navTasks"><span class="icon">☑</span> Tasks</a>
+                <a href="#" class="nav-item" id="navCalendar"><span class="icon">📅</span> Calendar</a>
+                <a href="#" class="nav-item" id="navTags"><span class="icon">🏷</span> Tags</a>
+                <a href="#" class="nav-item" id="navShared"><span class="icon">👥</span> Shared with me</a>
+                <a href="#" class="nav-item" id="navChat"><span class="icon">💬</span> Chat</a>
+                <a href="#" class="nav-item" id="navDashboard"><span class="icon">📊</span> Dashboard</a>
+                <a href="#" class="nav-item" id="navSettings"><span class="icon">⚙</span> Settings</a>
+            </nav>
+            <button id="openModalBtn" class="new-task-btn">NEW TASK</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="user-profile">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="avatar">
+                    <span class="user-name" id="headerUserName">Samir Mammadov</span>
+                </div>
+                <div class="header-actions">
+                    <div class="backup-section">
+                        <button id="exportBtn" class="icon-btn" title="Export Tasks">📤</button>
+                        <label for="importInput" class="icon-btn import-label" title="Import Tasks" style="margin: 0; padding: 0;">📥</label>
+                        <input type="file" id="importInput" accept=".json" hidden>
+                    </div>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search tasks...">
+                    </div>
+                    <div class="notification-wrapper" style="position: relative;">
+                        <button class="icon-btn notify-btn">🔔</button>
+                        <div class="notification-panel" id="notificationPanel">
+                            <div class="notification-header">
+                                <h4>Notifications</h4>
+                                <button id="clearNotifsBtn">Clear</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notif-item">
+                                    <span class="notif-icon">✅</span>
+                                    <div class="notif-content">
+                                        <p><strong>System</strong>: Welcome to ToDo Pro!</p>
+                                        <small>Just now</small>
+                                    </div>
+                                </div>
+                                <div class="notif-item">
+                                    <span class="notif-icon">📅</span>
+                                    <div class="notif-content">
+                                        <p><strong>Reminder</strong>: You have a task due soon.</p>
+                                        <small>2 hours ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="themeToggle" class="icon-btn">🌙</button>
+                </div>
+            </header>
+
+            <!-- Board Toolbar -->
+            <div class="board-toolbar">
+                <div class="sort-controls">
+                    <span class="icon">↑↓</span> 
+                    <select id="sortSelect" style="background: transparent; border: none; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; outline: none; color: inherit;">
+                        <option value="default">Custom (Drag & Drop)</option>
+                        <option value="priority">Priority</option>
+                        <option value="dueDate">Due Date</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </select>
+                </div>
+                <div class="view-controls">
+                    <button class="view-btn"><span class="icon">☷</span> List view</button>
+                    <button class="view-btn active"><span class="icon">⊞</span> Grid view</button>
+                    <button class="view-btn"><span class="icon">📅</span> Calendar view</button>
+                </div>
+            </div>
+
+            <!-- Tasks View -->
+            <div class="view-container" id="tasksView">
+                <!-- Kanban Board -->
+                <div class="kanban-board">
+                    <!-- To Do Column -->
+                    <div class="column" data-status="todo">
+                        <div class="column-header todo-header">
+                            <h3>TO DO (<span class="count">0</span>)</h3>
+                        </div>
+                        <div class="task-list" id="todoList"></div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="column" data-status="in-progress">
+                        <div class="column-header in-progress-header">
+                            <h3>IN PROGRESS (<span class="count">0</span>)</h3>
+                        </div>
+                        <div class="task-list" id="inProgressList"></div>
+                    </div>
+
+                    <!-- Complete Column -->
+                    <div class="column" data-status="complete">
+                        <div class="column-header complete-header">
+                            <h3>COMPLETE (<span class="count">0</span>)</h3>
+                        </div>
+                        <div class="task-list" id="completeList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div class="view-container" id="calendarView" style="display:none">
+                <div class="calendar-header">
+                    <button id="prevMonthBtn" class="icon-btn">◀</button>
+                    <h2 id="monthYear"></h2>
+                    <button id="nextMonthBtn" class="icon-btn">▶</button>
+                </div>
+                <div class="weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div id="calendarGrid"></div>
+            </div>
+
+            <!-- Tags View -->
+            <div class="view-container" id="tagsView" style="display:none">
+                <div class="tags-board" id="tagsBoard"></div>
+            </div>
+
+            <!-- Shared View -->
+            <div class="view-container" id="sharedView" style="display:none">
+                <div class="calendar-header">
+                    <h2>👥 Shared with me</h2>
+                </div>
+                <div class="shared-board" id="sharedBoard"></div>
+            </div>
+
+            <!-- Chat View -->
+            <div class="view-container" id="chatView" style="display:none">
+                <div class="chat-layout">
+                    <div class="chat-sidebar" id="chatContacts">
+                        <!-- Render contacts here -->
+                    </div>
+                    <div class="chat-main">
+                        <div class="chat-header">
+                            <h3 id="activeChatName">Alex</h3>
+                        </div>
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Render messages here -->
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" placeholder="Type a message...">
+                            <button id="sendChatBtn" class="primary-btn" style="margin-top:0;">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard View -->
+            <div class="view-container" id="dashboardView" style="display:none">
+                <div class="calendar-header">
+                    <h2>📊 Analytics Dashboard</h2>
+                </div>
+                <div class="bento-grid" id="bentoGridContainer">
+                    <!-- Dynamic Bento Content injected by JS -->
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div class="view-container" id="settingsView" style="display:none">
+                <div class="settings-layout">
+                    <!-- Profile -->
+                    <div class="settings-card">
+                        <h3>👤 Profile</h3>
+                        <div class="settings-row">
+                            <label style="font-weight: 600;">Name</label>
+                            <input type="text" id="settingsName" class="settings-input" value="Samir Mammadov">
+                        </div>
+                    </div>
+
+                    <!-- Appearance -->
+                    <div class="settings-card">
+                        <h3>🎨 Appearance</h3>
+                        <div class="settings-row">
+                            <label style="font-weight: 600;">Dark Mode</label>
+                            <button id="settingsThemeToggle" class="primary-btn" style="margin-top:0;">Toggle Theme</button>
+                        </div>
+                        <div class="settings-row">
+                            <label style="font-weight: 600;">Accent Color</label>
+                            <div class="color-picker" id="accentColorPicker">
+                                <button class="color-btn" data-color="#9EF088" style="background:#9EF088;"></button>
+                                <button class="color-btn" data-color="#60A5FA" style="background:#60A5FA;"></button>
+                                <button class="color-btn" data-color="#F472B6" style="background:#F472B6;"></button>
+                                <button class="color-btn" data-color="#C084FC" style="background:#C084FC;"></button>
+                                <button class="color-btn" data-color="#FB923C" style="background:#FB923C;"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <h3>⚠ Data Management</h3>
+                        <div class="settings-row">
+                            <button id="settingsExportBtn" class="primary-btn" style="margin-top:0; flex:1;">📤 Export JSON</button>
+                        </div>
+                        <div class="settings-row">
+                            <label for="settingsImportInput" class="primary-btn" style="cursor:pointer; text-align:center; flex:1; margin-top:0;">📥 Import JSON</label>
+                            <input type="file" id="settingsImportInput" accept=".json" hidden>
+                        </div>
+                        <div class="settings-row" style="margin-top:20px;">
+                            <button id="clearTasksBtn" class="danger-btn">🗑 Clear All Tasks</button>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="settings-card">
+                        <h3>📊 Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item"><span id="statTotal">0</span><br>Total Tasks</div>
+                            <div class="stat-item"><span id="statCompleted">0</span><br>Completed</div>
+                            <div class="stat-item"><span id="statPending">0</span><br>Pending</div>
+                            <div class="stat-item"><span id="statShared">0</span><br>Shared Tasks</div>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="settings-card">
+                        <h3>🔄 Preferences</h3>
+                        <button id="resetPrefsBtn" class="secondary-btn">Reset Appearance</button>
+                    </div>
+
+                    <!-- About App -->
+                    <div class="settings-card">
+                        <h3>ℹ️ About App</h3>
+                        <p style="margin-bottom:15px; font-size:14px; color:var(--text-main); line-height:1.6;">
+                            <strong>To-Do App Pro v1.0</strong><br>
+                            Built with HTML, CSS, Vanilla JS & LocalStorage.<br>
+                            Created by Vindhya Lekhana
+                        </p>
+                        <a href="https://github.com" target="_blank" class="primary-btn" style="text-decoration:none; display:block; text-align:center; margin-top:0;">View Source</a>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">New Task</h2>
+            <div class="modal-body">
+                <input type="text" id="taskInput" placeholder="Enter task title...">
+                <textarea id="taskDesc" placeholder="Enter task description..."></textarea>
+                
+                <div class="modal-row">
+                    <input type="date" id="dueDate">
+                    <select id="category">
+                        <option value="Study">Study</option>
+                        <option value="Work">Work</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Health">Health</option>
+                    </select>
+                    <select id="priority">
+                        <option value="High">🔴 High</option>
+                        <option value="Medium" selected>🟡 Medium</option>
+                        <option value="Low">🟢 Low</option>
+                    </select>
+                    <select id="statusSelect">
+                        <option value="todo">To Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="complete">Complete</option>
+                    </select>
+                </div>
+
+                <div class="modal-row" style="margin-top: 5px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 10px; color: var(--text-main); font-weight: 500;">
+                        <input type="checkbox" id="isSharedCheckbox" style="width: 20px; height: 20px;"> Shared Task
+                    </label>
+                    <input type="text" id="sharedByInput" placeholder="Shared by (e.g. Alex)" style="display: none;">
+                </div>
+                
+                <button id="addBtn" class="primary-btn">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js for Dashboard Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
